@@ -34,7 +34,7 @@ void task_main(intptr_t exinf){
 		if(timer1.read_ms() > 3000){
 			break;
 		}
-		//初期地点記憶
+		//蛻晄悄蝨ｰ轤ｹ險俶�ｶ
 		zumo.getMagetism(&tx,&ty,&tz);
 		sx = (sx + tx)/2;
 		sy = (sy + ty)/2;
@@ -48,7 +48,7 @@ void task_main(intptr_t exinf){
 
 		timer1.reset();
 		timer1.start();
-		//前進
+		//蜑埼ｲ
 		while(1){
 			if(timer1.read_ms() > 5000){
 				break;
@@ -59,13 +59,13 @@ void task_main(intptr_t exinf){
 			}else{
 				moveRightMortor(true);
 			}
-			sy = y;
+			//sy = y;
 		}
 
 		timer1.reset();
 		timer1.start();
 
-		//後退
+		//蠕碁
 		while(1){
 			if(timer1.read_ms() > 5000){
 				break;
@@ -77,7 +77,7 @@ void task_main(intptr_t exinf){
 			}else{
 				moveRightMortor(false);
 			}
-			sy = y;
+			//sy = y;
 		}
 	}
 
