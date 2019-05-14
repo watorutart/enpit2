@@ -1,0 +1,47 @@
+#include <kernel.h>
+#include "kernel_cfg.h"
+#include "app.h"
+
+#include "mbed.h"
+
+#include "app_config.h"
+
+#include "Zumo.h"
+#include "Milkcocoa.h"
+
+extern void onpush(MQTT::MessageData& md);
+Serial pc(USBTX, USBRX);
+Zumo zumo;
+
+static int speed = 80;
+static int steer = 0;
+DigitalOut led_red(LED1);
+DigitalOut led_green(LED2);
+DigitalOut led_blue(LED3);
+
+DigitalIn sw1(D12);
+
+void onpush(MQTT::MessageData& md)
+{
+	pc.printf("onpush\n\r");
+    MQTT::Message &message = md.message;
+    DataElement de = DataElement((char*)message.payload);
+	int v = de.getInt("z");
+}
+
+//LEDの点滅をするメソッド
+void led_blink() {
+	//led_red = 1;
+	int i;
+	for(i = 0 ; i<=2 ; i++){
+		led_green = 1;
+		dly_tsk(500);
+		led_green = 0;
+		dly_tsk(500);
+	}
+}
+
+
+void task_main(intptr_t exinf) {  
+    led_blink();
+}
