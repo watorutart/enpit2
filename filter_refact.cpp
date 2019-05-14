@@ -1,0 +1,110 @@
+#include <kernel.h>
+#include "kernel_cfg.h"
+#include "app.h"
+
+#include "mbed.h"
+
+#include "app_config.h"
+
+#include "Zumo.h"
+#include "Milkcocoa.h"
+
+extern void onpush(MQTT::MessageData& md);
+Serial pc(USBTX, USBRX);
+Zumo zumo;
+
+static int speed = 80;
+static int steer = 0;
+DigitalOut ledR(LED1);
+
+#define DATA_SIZE 100
+
+int data[3][DATA_SIZE];
+
+DigitalIn sw1(D12);
+
+void onpush(MQTT::MessageData& md)
+{
+	pc.printf("onpush\n\r");
+    MQTT::Message &message = md.message;
+    DataElement de = DataElement((char*)message.payload);
+	int v = de.getInt("z");
+}
+
+/*
+ * 受け取ったDATA_SIZE個のデータの平均を返す関数
+ */
+short clc_avg(int data[]){
+	int sum = 0;
+	for(int i = 0;i<DATA_SIZE;i++){
+		sum += data[i];
+	}
+	pc.printf("sum : %d\r\n", sum);
+	return sum/DATA_SIZE;
+}
+
+/*
+ * x, y, zの平滑化フィルタを算出する関数
+ * 引数:要素数３のshort型配列
+ */
+void clc_filter(int *filter){
+	pc.printf("clc_filter\r\n");
+	filter[0] = clc_avg(data[0]);
+	filter[1] = clc_avg(data[1]);
+	filter[2] = clc_avg(data[2]);
+}
+
+/*
+ * 加速度センサの値をDATA_SIZE分dataに格納する関数
+ */
+void get_Accel_data(){
+	int i = 0;
+	short x, y, z;
+	pc.printf("get_accel\r\n");
+
+	while(i < DATA_SIZE){
+		zumo.getAcceleration(&x, &y, &z);
+		data[0][i] = x;
+		data[1][i] = y;
+		data[2][i] = z;
+		pc.printf("data:%d %d %d\r\n", data[0][i], data[1][i], data[2][i]);
+		i++;
+	}
+}
+/*
+ * x, y, zにフィルタをかける関数
+ */
+void filtered(short *x, short *y, short *z, int *filter){
+	*x = *x - filter[0];
+	*y = *y - filter[1];
+	*z = *z - filter[2];
+}
+
+void task_main(intptr_t exinf) {
+	int n = 1;
+	sw1.mode(PullUp);
+	pc.baud(115200);
+
+	short x, y, z;
+	int avg[3];
+	int data_size = 100;
+	int **data;
+
+	data = (int**)malloc(sizeof(int*)*3);
+	for(int i = 0; i<3; i++){
+		data[i] = (int*)malloc(sizeof(int)*data_size);
+	}
+
+	get_Accel_data();
+
+	clc_filter(avg);
+	pc.printf("avg: %d %d %d \r\n", avg[0], avg[1], avg[2]);
+	pc.printf("loop end\r\n");
+
+	while(n == 1){
+		n = sw1;
+		zumo.getAcceleration(&x, &y, &z);
+		filtered(&x, &y, &z, avg);
+		pc.printf("%d %d %d\r\n", x, y, z);
+	}
+}
