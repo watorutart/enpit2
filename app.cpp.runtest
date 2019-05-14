@@ -1,0 +1,100 @@
+#include <kernel.h>
+#include "kernel_cfg.h"
+#include "app.h"
+#include "mbed.h"
+#include "app_config.h"
+#include "Zumo.h"
+#include "Milkcocoa.h"
+Serial pc(USBTX, USBRX);
+Zumo zumo;
+DigitalIn sw1(D12);
+
+void moveLeftMortor(bool);
+void moveRightMortor(bool);
+
+void task_main(intptr_t exinf){
+	short x,y,z;
+	short sx,sy,sz;
+	short tx,ty,tz;
+	Timer timer1;
+	int t,n;
+
+	zumo.getMagetism(&sx,&sy,&sz);
+
+	sw1.mode(PullUp);
+	n = sw1;
+	while(sw1 != 0){
+
+	}
+
+	timer1.reset();
+	timer1.start();
+
+	while(1){
+		if(timer1.read_ms() > 3000){
+			break;
+		}
+		//初期地点記憶
+		zumo.getMagetism(&tx,&ty,&tz);
+		sx = (sx + tx)/2;
+		sy = (sy + ty)/2;
+		sz = (sz + tz)/2;
+	}
+
+	timer1.reset();
+	timer1.start();
+
+	while(1){
+
+		timer1.reset();
+		timer1.start();
+		//前進
+		while(1){
+			if(timer1.read_ms() > 5000){
+				break;
+			}
+			zumo.getMagetism(&x,&y,&z);
+			if(y > sy){
+				moveLeftMortor(true);
+			}else{
+				moveRightMortor(true);
+			}
+			sy = y;
+		}
+
+		timer1.reset();
+		timer1.start();
+
+		//後退
+		while(1){
+			if(timer1.read_ms() > 5000){
+				break;
+			}
+			zumo.getMagetism(&x,&y,&z);
+
+			if(y > sy){
+				moveLeftMortor(false);
+			}else{
+				moveRightMortor(false);
+			}
+			sy = y;
+		}
+	}
+
+}
+
+void moveLeftMortor(bool i){
+	if(i == true){
+		zumo.driveTank(90,70);
+	}else{
+		zumo.driveTank(-90,-70);
+	}
+}
+
+void moveRightMortor(bool i){
+	if(i == true){
+		zumo.driveTank(70,90);
+	}else{
+		zumo.driveTank(-70,-90);
+	}
+}
