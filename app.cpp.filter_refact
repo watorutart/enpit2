@@ -1,18 +1,14 @@
 #include <kernel.h>
 #include "kernel_cfg.h"
 #include "app.h"
-
 #include "mbed.h"
-
 #include "app_config.h"
-
 #include "Zumo.h"
 #include "Milkcocoa.h"
 
 extern void onpush(MQTT::MessageData& md);
 Serial pc(USBTX, USBRX);
 Zumo zumo;
-
 static int speed = 80;
 static int steer = 0;
 DigitalOut ledR(LED1);
@@ -20,7 +16,6 @@ DigitalOut ledR(LED1);
 #define DATA_SIZE 100
 
 int data[3][DATA_SIZE];
-
 DigitalIn sw1(D12);
 
 /*
@@ -50,17 +45,21 @@ void clc_filter(int *filter){
  * 加速度センサの値をDATA_SIZE分dataに格納する関数
  */
 void get_Accel_data(){
+	int loop_count = 0;
 	int i = 0;
 	short x, y, z;
 	pc.printf("get_accel\r\n");
 
 	while(i < DATA_SIZE){
 		zumo.getAcceleration(&x, &y, &z);
-		data[0][i] = x;
-		data[1][i] = y;
-		data[2][i] = z;
+		if(loop_count>10){
+			data[0][i] = x;
+			data[1][i] = y;
+			data[2][i] = z;
+			i++;
+		}
 		pc.printf("data:%d %d %d\r\n", data[0][i], data[1][i], data[2][i]);
-		i++;
+		loop_count++;
 	}
 }
 /*
