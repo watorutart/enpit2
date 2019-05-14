@@ -23,14 +23,6 @@ int data[3][DATA_SIZE];
 
 DigitalIn sw1(D12);
 
-void onpush(MQTT::MessageData& md)
-{
-	pc.printf("onpush\n\r");
-    MQTT::Message &message = md.message;
-    DataElement de = DataElement((char*)message.payload);
-	int v = de.getInt("z");
-}
-
 /*
  * 受け取ったDATA_SIZE個のデータの平均を返す関数
  */
