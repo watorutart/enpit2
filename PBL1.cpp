@@ -106,6 +106,7 @@ void plain(){
 }
 
 void slope(){
+	
 	//LED1を点灯
 	led_r = 1;
 	while(1){
