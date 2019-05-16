@@ -397,20 +397,20 @@ void filtering(){
 }
 void flat_Accel_data(){
 	//平坦な道時の加速度センサのデータをz1_dataに格納
+	z1_data[counter] = z;	
 	counter++;
 	if(counter == Z_DATA_SIZE){
 		counter = 0;
 	}
-	z1_data[counter] = z;
 }
 
 void slope_Accel_data(){
 	//坂道時の加速度センサの加速度センサのデータをz2_dataに格納
-	counter++;
+	z2_data[counter] = z;
+		counter++;
 	if(counter == Z_DATA_SIZE){
 		counter = 0;
 	}
-	z2_data[counter] = z;
 }
 
 float clc_avg(int size, int data[]){
