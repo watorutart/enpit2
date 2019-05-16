@@ -441,7 +441,7 @@ void disp_angle(){
 		dly_tsk(100);
 	}
 	disp_data();
-	pc.printf("angle:%f\r\n", clc_angle());
+	pc.printf("angle:%f\r\n", clc_angle()*180/3.14);
 }
 
 void disp_data(){
