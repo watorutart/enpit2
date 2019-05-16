@@ -51,6 +51,7 @@ int x,y,z;
 
 //add line
 int z1_data[Z_DATA_SIZE], z2_data[Z_DATA_SIZE];
+int counter = 0;
 
 void task_main(intptr_t exinf){
 	int n;
@@ -100,6 +101,7 @@ void plain(){
 			//坂道を検出したらbreak
 			break;
 		}
+		flat_Accel_data();
 	}
 }
 
@@ -114,6 +116,7 @@ void slope(){
 			//トップエリアを検出したらbreak
 			break;
 		}
+		slope_Accel_data();
 	}
 }
 
@@ -190,7 +193,7 @@ void goal(){
 bool searchSlope(){
 	//加速度を取得
 	filtering();
-	if(x > 2500){
+	if(x > 2000){
 		//x方向の加速度2500以上なら坂道発見
 		return true;
 	}else{
@@ -201,7 +204,7 @@ bool searchSlope(){
 bool searchTop(){
 	//加速度を取得
 	filtering();
-	if(x < 2500){
+	if(x < 2000){
 		//x方向の加速度2500以下ならトップ発見
 		return true;
 	}else{
@@ -320,22 +323,22 @@ void drive(int sp,int mode){
 	case 1:
 		//加速モードの処理
 		sp = accel(sp,4);
-		zumo.driveTank(sp+2,sp);
+		zumo.driveTank(sp,sp);
 		break;
 	case 2:
 		//減速モードの処理
 		sp = decel(sp,4);
-		zumo.driveTank(sp-2,sp);
+		zumo.driveTank(sp,sp);
 		break;
 	case 3:
 		//急加速モードの処理
 		sp = accel(sp,20);
-		zumo.driveTank(sp+2,sp);
+		zumo.driveTank(sp,sp);
 		break;
 	case 4:
 		//急減速モードの処理
 		sp = decel(sp,20);
-		zumo.driveTank(sp-2,sp);
+		zumo.driveTank(sp,sp);
 		break;
 	}
 	dly_tsk(50);
@@ -386,22 +389,22 @@ void filtering(){
 
 	}
 }
-
-//add lines
 void flat_Accel_data(){
 	//平坦な道時の加速度センサのデータをz1_dataに格納
-	for(int i=0; i<Z_DATA_SIZE; i++){
-		filtering();
-		z1_data[i] = z;
+	counter++;
+	if(counter == Z_DATA_SIZE){
+		counter = 0;
 	}
+	z1_data[counter] = z;
 }
 
 void slope_Accel_data(){
 	//坂道時の加速度センサの加速度センサのデータをz2_dataに格納
-	for(int i=0;i<Z_DATA_SIZE;i++){
-		filtering();
-		z1_data[i] = z;
+	counter++;
+	if(counter == Z_DATA_SIZE){
+		counter = 0;
 	}
+	z2_data[counter] = z;
 }
 
 float clc_avg(int size, int data[]){
@@ -428,5 +431,5 @@ void disp_angle(){
 		n = sw1;
 		dly_tsk(100);
 	}
-	pc.printf("角度は %f 度です。\r\n", clc_angle());
+	pc.printf("angle:%f\r\n", clc_angle());
 }
