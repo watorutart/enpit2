@@ -62,7 +62,7 @@ void task_main(intptr_t exinf){
 	n = sw1;
 	Timer timer1;
 
-	init_data();
+	init_data();	//add line
 
 	while(sw1 != 0){
 
@@ -94,7 +94,7 @@ void task_main(intptr_t exinf){
 	goal();
 
 	//角度の表示
-	disp_angle();
+	disp_angle();	//add line
 }
 
 void plain(){
@@ -106,7 +106,7 @@ void plain(){
 			//坂道を検出したらbreak
 			break;
 		}
-		flat_Accel_data();
+		flat_Accel_data();	//add line
 	}
 }
 
@@ -122,7 +122,7 @@ void slope(){
 			//トップエリアを検出したらbreak
 			break;
 		}
-		slope_Accel_data();
+		slope_Accel_data();	//add line
 	}
 }
 
